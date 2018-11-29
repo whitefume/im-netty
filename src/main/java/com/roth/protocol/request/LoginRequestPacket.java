@@ -1,9 +1,9 @@
-package com.roth.api.request;
+package com.roth.protocol.request;
 
-import com.roth.api.Packet;
+import com.roth.protocol.Packet;
 import lombok.Data;
 
-import static com.roth.api.Command.LOGIN_REQUEST;
+import static com.roth.protocol.command.Command.LOGIN_REQUEST;
 
 /**
  * 登录请求

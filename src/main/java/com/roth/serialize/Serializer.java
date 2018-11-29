@@ -1,4 +1,6 @@
-package com.roth.api;
+package com.roth.serialize;
+
+import com.roth.serialize.impl.JSONSerializer;
 
 public interface Serializer {
 

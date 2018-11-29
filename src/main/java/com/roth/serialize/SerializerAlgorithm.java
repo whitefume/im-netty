@@ -1,4 +1,4 @@
-package com.roth.api;
+package com.roth.serialize;
 
 public interface SerializerAlgorithm {
 

@@ -1,16 +1,18 @@
-package com.roth.api;
+package com.roth.protocol;
 
-import com.roth.api.request.LoginRequestPacket;
-import com.roth.api.request.LoginResponsePacket;
+import com.roth.protocol.request.LoginRequestPacket;
+import com.roth.protocol.request.MessageRequestPacket;
+import com.roth.protocol.response.LoginResponsePacket;
+import com.roth.protocol.response.MessageResponsePacket;
+import com.roth.serialize.Serializer;
+import com.roth.serialize.impl.JSONSerializer;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.roth.api.Command.LOGIN_REQUEST;
-import static com.roth.api.Command.LOGIN_RESPONSE;
+import static com.roth.protocol.command.Command.*;
 
 @Slf4j
 public class PacketCodeC {
@@ -27,14 +29,15 @@ public class PacketCodeC {
         PACKETTYPEMAP = new HashMap<>();
         PACKETTYPEMAP.put(LOGIN_REQUEST, LoginRequestPacket.class);
         PACKETTYPEMAP.put(LOGIN_RESPONSE, LoginResponsePacket.class);
+        PACKETTYPEMAP.put(MESSAGE_REQUEST, MessageRequestPacket.class);
+        PACKETTYPEMAP.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
 
         SERIALIZERMAP = new HashMap<>();
         Serializer jsonSerializer = new JSONSerializer();
         SERIALIZERMAP.put(jsonSerializer.getSerializerAlgorithm(), jsonSerializer);
     }
 
-    public ByteBuf encode(ByteBufAllocator byteBufAlloc, Packet packet) {
-        ByteBuf byteBuf = byteBufAlloc.ioBuffer();
+    public ByteBuf encode(ByteBuf byteBuf, Packet packet) {
         byte[] bytes = Serializer.DEFAULT_SERIALIZER.serialize(packet);
         byteBuf.writeInt(MAGIC_NUMBER);
         byteBuf.writeByte(packet.getVersion());

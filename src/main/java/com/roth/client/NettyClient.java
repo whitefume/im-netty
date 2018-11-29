@@ -1,5 +1,9 @@
 package com.roth.client;
 
+import com.roth.client.handler.LoginResponseHandler;
+import com.roth.client.handler.MessageResponseHandler;
+import com.roth.codec.PacketDecoder;
+import com.roth.codec.PacketEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -10,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.roth.api.Constants.*;
+import static com.roth.Constants.*;
 
 public class NettyClient {
     private static final Logger LOG = LoggerFactory.getLogger(NettyClient.class);
@@ -23,7 +27,10 @@ public class NettyClient {
                 .handler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel socketChannel) throws Exception {
-                        socketChannel.pipeline().addLast(new ClientHandler());
+                        socketChannel.pipeline().addLast(new PacketDecoder());
+                        socketChannel.pipeline().addLast(new LoginResponseHandler());
+                        socketChannel.pipeline().addLast(new MessageResponseHandler());
+                        socketChannel.pipeline().addLast(new PacketEncoder());
                     }
                 });
         connect(bootstrap, SERVER_HOST, SERVER_PORT, CLIENT_RETREY_NUMBER).sync();

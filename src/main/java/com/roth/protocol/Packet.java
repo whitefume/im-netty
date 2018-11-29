@@ -1,4 +1,4 @@
-package com.roth.api;
+package com.roth.protocol;
 
 import lombok.Data;
 

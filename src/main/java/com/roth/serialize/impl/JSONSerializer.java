@@ -1,6 +1,8 @@
-package com.roth.api;
+package com.roth.serialize.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.roth.serialize.Serializer;
+import com.roth.serialize.SerializerAlgorithm;
 
 public class JSONSerializer implements Serializer {
     @Override
