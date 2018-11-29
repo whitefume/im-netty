@@ -5,6 +5,10 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.roth.api.Constants.SERVER_PORT;
 
 /**
  * author:  Wang Yunlong
@@ -12,6 +16,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
  * purpose:
  **/
 public class NettyServer {
+    private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 
     public static void main(String... args) {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -20,11 +25,23 @@ public class NettyServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .handler(new ChannelInitializer<NioSocketChannel>() {
+                .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel nioSocketChannel) {
-
+                        nioSocketChannel.pipeline().addLast(new ServerHandler());
                     }
                 });
-        serverBootstrap.bind(8000);
+        bind(serverBootstrap, SERVER_PORT);
+    }
+
+    private static void bind(final ServerBootstrap serverBootstrap, final int port) {
+        serverBootstrap.bind(port).addListener(
+                future -> {
+                    if (future.isSuccess()) {
+                        LOG.info("port: {} bind success", port);
+                    } else {
+                        LOG.warn("prot: {} bind false", port);
+                        bind(serverBootstrap, port + 1);
+                    }
+                });
     }
 }
