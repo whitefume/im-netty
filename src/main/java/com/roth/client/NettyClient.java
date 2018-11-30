@@ -4,6 +4,7 @@ import com.roth.client.handler.LoginResponseHandler;
 import com.roth.client.handler.MessageResponseHandler;
 import com.roth.codec.PacketDecoder;
 import com.roth.codec.PacketEncoder;
+import com.roth.codec.Spliter;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -25,8 +26,10 @@ public class NettyClient {
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<NioSocketChannel>() {
+
                     @Override
                     protected void initChannel(NioSocketChannel socketChannel) throws Exception {
+                        socketChannel.pipeline().addLast(new Spliter());
                         socketChannel.pipeline().addLast(new PacketDecoder());
                         socketChannel.pipeline().addLast(new LoginResponseHandler());
                         socketChannel.pipeline().addLast(new MessageResponseHandler());

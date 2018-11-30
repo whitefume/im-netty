@@ -1,6 +1,6 @@
 package com.roth.client.handler;
 
-import com.roth.attribute.AttributeUtil;
+import com.roth.attribute.SessionUtil;
 import com.roth.protocol.request.LoginRequestPacket;
 import com.roth.protocol.response.LoginResponsePacket;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +31,7 @@ public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginRespo
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, LoginResponsePacket loginResponsePacket) {
         if (loginResponsePacket.isSuccess()) {
             log.info("客户端登录成功");
-            AttributeUtil.markAsLogin(channelHandlerContext.channel());
+            SessionUtil.markAsLogin(channelHandlerContext.channel());
         } else {
             log.info("客户端登录失败");
         }

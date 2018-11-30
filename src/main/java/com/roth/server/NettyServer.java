@@ -1,11 +1,13 @@
 package com.roth.server;
 
-import com.roth.codec.PacketDecoder;
-import com.roth.codec.PacketEncoder;
+import com.roth.codec.PacketCodecHandler;
+import com.roth.codec.Spliter;
+import com.roth.server.handler.AuthHandler;
+import com.roth.server.handler.IMHandler;
 import com.roth.server.handler.LoginRequestHandler;
-import com.roth.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -28,12 +30,16 @@ public class NettyServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 1024)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     protected void initChannel(NioSocketChannel nioSocketChannel) {
-                        nioSocketChannel.pipeline().addLast(new PacketDecoder());
-                        nioSocketChannel.pipeline().addLast(new LoginRequestHandler());
-                        nioSocketChannel.pipeline().addLast(new MessageRequestHandler());
-                        nioSocketChannel.pipeline().addLast(new PacketEncoder());
+                        nioSocketChannel.pipeline().addLast(new Spliter());
+                        nioSocketChannel.pipeline().addLast(PacketCodecHandler.INSTANCE);
+                        nioSocketChannel.pipeline().addLast(LoginRequestHandler.INSTANCE);
+                        nioSocketChannel.pipeline().addLast(AuthHandler.INSTANCE);
+                        nioSocketChannel.pipeline().addLast(IMHandler.INSTANCE);
                     }
                 });
         bind(serverBootstrap, SERVER_PORT);
